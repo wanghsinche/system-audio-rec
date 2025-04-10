@@ -1,0 +1,60 @@
+name: Build and Release
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build:
+    runs-on: macos-latest # Use the latest macOS runner which includes Xcode
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4 # Use latest checkout action
+
+    # Note: macos-latest runner usually has a recent Xcode selected by default.
+    # If a specific version is needed, uncomment and adjust the following:
+    # - name: Select Xcode version
+    #   run: sudo xcode-select -s /Applications/Xcode_XX.Y.app/Contents/Developer
+
+    - name: Build for ARM64 Release
+      run: swift build --arch arm64 -c release --product ScreenCaptureTool
+
+    - name: Get executable path
+      id: get_path
+      # The executable path is typically .build/arm64-apple-macosx/release/ExecutableName
+      run: echo "executable_path=$(swift build --arch arm64 -c release --show-bin-path)/ScreenCaptureTool" >> $GITHUB_OUTPUT
+
+    - name: Get current date for tag
+      id: date
+      run: echo "date=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+
+    - name: Create Release Tag
+      id: create_tag
+      run: |
+        TAG_NAME="release-${{ steps.date.outputs.date }}"
+        echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+        git tag $TAG_NAME
+        git push origin $TAG_NAME
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is automatically provided by GitHub Actions
+      with:
+        tag_name: ${{ steps.create_tag.outputs.tag_name }}
+        release_name: Release ${{ steps.create_tag.outputs.tag_name }}
+        body: |
+          Automated release build for ScreenCaptureTool (arm64).
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset (Executable)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ steps.get_path.outputs.executable_path }}
+        asset_name: ScreenCaptureTool-arm64 # Name of the asset in the release
+        asset_content_type: application/octet-stream
