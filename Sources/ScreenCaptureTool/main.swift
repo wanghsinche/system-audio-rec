@@ -5,7 +5,8 @@ print("Hello, world!")
 
 // Add logging to check if ScreenCaptureKit is available
 if #available(macOS 12.3, *) {
-    print("ScreenCaptureKit is available.")
+    print("ScreenCaptureKit is available (macOS 12.3+ required)")
+    print("Available SCShareableContent methods: \(SCShareableContent.self)")
     
     // Log the process info
     let currentProcess = ProcessInfo.processInfo
@@ -13,7 +14,7 @@ if #available(macOS 12.3, *) {
     print("Process ID: \(currentProcess.processIdentifier)")
     
     // Attempt to get the available content
-    SCShareableContent.getContent { (content, error) in
+    SCShareableContent.getCurrent { (content, error) in
         if let error = error {
             print("Error getting shareable content: \(error)")
         } else {
