@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "ScreenCaptureTool",
     platforms: [
-        .macOS(.v12_3) // Specify minimum macOS version for ScreenCaptureKit
+        .macOS(.v12) // Specify minimum macOS version for ScreenCaptureKit
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -17,7 +17,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .executableTarget(
             name: "ScreenCaptureTool",
-            dependencies: [],
+            dependencies: ["ScreenCaptureKit"],
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-embed-bitcode"])
             ]),
