@@ -2,6 +2,9 @@ name: Build and Release
 
 on:
   workflow_dispatch: # Allows manual triggering
+  push:
+    branches:
+      - master
 
 jobs:
   build:
