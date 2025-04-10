@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "ScreenCaptureTool",
     platforms: [
-        .macOS(.v12_3) // ScreenCaptureKit requires macOS 12.3+
+        .macOS(.init("12.3")) // ScreenCaptureKit requires macOS 12.3+
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
